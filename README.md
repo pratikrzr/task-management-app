@@ -89,6 +89,12 @@ GEMINI_API_KEY=your_google_gemini_api_key
 node server.js
 ```
 
+or
+
+```bash
+npm run dev
+```
+
 👉 Backend will run at: [http://localhost:5000](http://localhost:5000)
 
 ---
@@ -114,7 +120,7 @@ VITE_API_URL=http://localhost:5000
 npm run dev
 ```
 
-👉 Frontend will run at: [http://localhost:5173](http://localhost:5173)
+👉 Frontend will run at: [http://localhost:3000](http://localhost:3000)
 
 ---
 
