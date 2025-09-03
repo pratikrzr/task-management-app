@@ -51,7 +51,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
 
       const subtasksResponse = await callGeminiAPI(subtasksPrompt);
 
-      // Parse subtasks JSON
       let subtasks = [];
       let totalStoryPoints = 0;
 
@@ -66,7 +65,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
         );
       } catch (parseError) {
         console.error("Error parsing subtasks JSON:", parseError);
-        // Fallback subtasks
         subtasks = [
           {
             title: "Plan and Research",
@@ -87,7 +85,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
         totalStoryPoints = 10;
       }
 
-      // Update task in database
       await Task.findByIdAndUpdate(taskId, {
         description: description.trim(),
         subtasks,
@@ -99,7 +96,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
     } catch (error) {
       console.error("Error processing ticket with AI:", error);
 
-      // Fallback update
       await Task.findByIdAndUpdate(event.data.taskId, {
         description: "AI processing failed. Please add description manually.",
         aiProcessed: true,

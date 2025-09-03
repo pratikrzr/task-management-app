@@ -1,10 +1,7 @@
-// backend/src/controllers/taskController.js - FIXED VERSION
 import Task from "../models/Task.js";
 
-// Fixed: Use correct model name
 const GEMINI_MODEL = "gemini-1.5-flash"; // Changed from 'gemini-pro'
 
-// Debug: Test Gemini API connection
 async function testGeminiAPI() {
   console.log("🔍 Testing Gemini API connection...");
   console.log(
@@ -51,7 +48,6 @@ async function testGeminiAPI() {
   }
 }
 
-// Direct Gemini API call function with correct model
 async function callGeminiAPI(prompt) {
   try {
     console.log("🤖 Calling Gemini API with model:", GEMINI_MODEL);
@@ -90,14 +86,12 @@ async function callGeminiAPI(prompt) {
   }
 }
 
-// Process task with AI directly (with correct model)
 async function processTaskWithAI(taskId, title) {
   console.log(
     `\n🚀 Starting AI processing for task: "${title}" (ID: ${taskId})`
   );
 
   try {
-    // Test API connection first
     const apiWorking = await testGeminiAPI();
     if (!apiWorking) {
       throw new Error("Gemini API connection failed");
@@ -113,7 +107,6 @@ async function processTaskWithAI(taskId, title) {
     );
 
     console.log("🔧 Generating subtasks...");
-    // Generate subtasks
     const subtasksPrompt = `Break down this task: "${title}" into 3-5 subtasks. Return ONLY a JSON array with this exact format:
 [{"title": "Subtask title", "description": "Subtask description", "storyPoints": 2}]
 Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON array, no other text.`;
@@ -121,7 +114,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
     const subtasksResponse = await callGeminiAPI(subtasksPrompt);
     console.log("📋 Raw subtasks response:", subtasksResponse);
 
-    // Parse subtasks JSON
     let subtasks = [];
     let totalStoryPoints = 0;
 
@@ -144,7 +136,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
     } catch (parseError) {
       console.error("❌ Error parsing subtasks JSON:", parseError.message);
       console.log("🔄 Using fallback subtasks...");
-      // Fallback subtasks
       subtasks = [
         {
           title: "Plan and Research",
@@ -166,7 +157,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
     }
 
     console.log("💾 Updating database...");
-    // Update task in database
     const updatedTask = await Task.findByIdAndUpdate(
       taskId,
       {
@@ -192,7 +182,6 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
     console.error("📚 Full error:", error);
 
     try {
-      // Fallback update
       console.log("🔄 Applying fallback update...");
       await Task.findByIdAndUpdate(taskId, {
         description: `AI processing failed: ${error.message}. Please add description manually.`,
@@ -219,7 +208,6 @@ export const createTask = async (req, res) => {
     await task.save();
     console.log("✅ Task saved to database:", task._id);
 
-    // Process with AI in background (no await - runs asynchronously)
     console.log("🚀 Starting AI processing in background...");
     processTaskWithAI(task._id.toString(), task.title).catch((error) => {
       console.error("💥 Background AI processing failed:", error.message);
