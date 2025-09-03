@@ -59,7 +59,6 @@ const TicketDetailModal = ({
   };
 
   const handleSubtaskUpdate = (subtaskId, newStatus) => {
-    // This would typically update the subtask status via API
     console.log(`Update subtask ${subtaskId} to ${newStatus}`);
   };
 
@@ -175,7 +174,7 @@ const TicketDetailModal = ({
                 <div className="subtasks-list-modal">
                   {task.subtasks.map((subtask) => (
                     <SubtaskCard
-                      key={subtask.id}
+                      key={subtask._id}
                       subtask={subtask}
                       onUpdateSubtask={handleSubtaskUpdate}
                     />

@@ -24,12 +24,57 @@ function App() {
     }
   };
 
-  const createTask = async (title) => {
+  const createTask = async (title, priority = "low") => {
+    console.log("App: createTask called with:", { title, priority });
+
+    if (!title || !title.trim()) {
+      console.error("App: No title provided");
+      alert("Please enter a task title");
+      return;
+    }
+
     try {
-      const response = await taskAPI.createTask(title);
-      setTasks((prev) => [response.data, ...prev]);
+      console.log("App: Calling taskAPI.createTask...");
+      const response = await taskAPI.createTask(title, priority);
+      console.log("App: Task created successfully:", response.data);
+
+      setTasks((prev) => {
+        console.log("App: Adding task to state, current tasks:", prev.length);
+        return [response.data, ...prev];
+      });
+
+      console.log("App: Task creation completed");
     } catch (error) {
-      console.error("Error creating task:", error);
+      console.error("App: Error creating task:", error);
+      console.error(
+        "App: Error details:",
+        error.response?.data || error.message
+      );
+      alert(
+        `Failed to create task: ${error.response?.data?.error || error.message}`
+      );
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      console.log("Deleting task with ID:", taskId); // Debug log
+      const response = await taskAPI.deleteTask(taskId);
+      console.log("Delete response:", response); // Debug log
+
+      setTasks((prev) => prev.filter((task) => task._id !== taskId));
+
+      if (selectedTask && selectedTask._id === taskId) {
+        setIsDetailModalOpen(false);
+        setSelectedTask(null);
+      }
+
+      alert("Task deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting task:", error);
+      alert(
+        "Failed to delete task. Please check if the backend endpoint exists."
+      );
     }
   };
 
@@ -39,7 +84,6 @@ function App() {
       setTasks((prev) =>
         prev.map((task) => (task._id === taskId ? response.data : task))
       );
-      // Update selected task if it's the same task
       if (selectedTask && selectedTask._id === taskId) {
         setSelectedTask(response.data);
       }
@@ -54,7 +98,7 @@ function App() {
       setTasks((prev) =>
         prev.map((task) => (task._id === taskId ? response.data : task))
       );
-      // Update selected task if it's the same task
+
       if (selectedTask && selectedTask._id === taskId) {
         setSelectedTask(response.data);
       }
@@ -73,7 +117,6 @@ function App() {
     setSelectedTask(null);
   };
 
-  // Fetch tasks on component mount and then poll every 5 seconds
   useEffect(() => {
     fetchTasks();
     const interval = setInterval(fetchTasks, 5000);
@@ -112,6 +155,7 @@ function App() {
           onAddComment={addComment}
           onUpdateStatus={updateTaskStatus}
           onShowDetails={showTaskDetails}
+          onDeleteTask={deleteTask}
         />
       </main>
 

@@ -15,17 +15,24 @@ const subtaskSchema = new mongoose.Schema({
     enum: ["todo", "in-progress", "done"],
     default: "todo",
   },
+  assignee: { type: String, default: "" },
 });
 
 const taskSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, default: "" },
+  priority: {
+    type: String,
+    enum: ["low", "medium", "high"],
+    default: "low",
+  },
   storyPoints: { type: Number, default: 0 },
   status: {
     type: String,
     enum: ["todo", "in-progress", "done"],
     default: "todo",
   },
+  assignee: { type: String, default: "" },
   subtasks: [subtaskSchema],
   comments: [commentSchema],
   aiProcessed: { type: Boolean, default: false },

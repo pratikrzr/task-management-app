@@ -1,6 +1,6 @@
 import Task from "../models/Task.js";
 
-const GEMINI_MODEL = "gemini-1.5-flash"; // Changed from 'gemini-pro'
+const GEMINI_MODEL = "gemini-1.5-flash";
 
 async function testGeminiAPI() {
   console.log("🔍 Testing Gemini API connection...");
@@ -196,17 +196,22 @@ Use Fibonacci numbers for storyPoints (1, 2, 3, 5, 8). Return only the JSON arra
 
 export const createTask = async (req, res) => {
   try {
-    const { title } = req.body;
-    console.log("\n📝 Creating new task:", title);
+    const { title, priority = "low" } = req.body;
+    console.log("\n📝 Creating new task:", title, "with priority:", priority);
 
     if (!title) {
       console.log("❌ No title provided");
       return res.status(400).json({ error: "Title is required" });
     }
 
-    const task = new Task({ title });
+    const task = new Task({ title, priority });
     await task.save();
-    console.log("✅ Task saved to database:", task._id);
+    console.log(
+      "✅ Task saved to database:",
+      task._id,
+      "Priority:",
+      task.priority
+    );
 
     console.log("🚀 Starting AI processing in background...");
     processTaskWithAI(task._id.toString(), task.title).catch((error) => {
@@ -216,6 +221,30 @@ export const createTask = async (req, res) => {
     res.status(201).json(task);
   } catch (error) {
     console.error("❌ Create task error:", error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deleteTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log("🗑️ Attempting to delete task with ID:", id);
+
+    const task = await Task.findByIdAndDelete(id);
+
+    if (!task) {
+      console.log("❌ Task not found for deletion:", id);
+      return res.status(404).json({ error: "Task not found" });
+    }
+
+    console.log("✅ Task deleted successfully:", task.title);
+    res.json({
+      success: true,
+      message: "Task deleted successfully",
+      deletedTask: task,
+    });
+  } catch (error) {
+    console.error("❌ Delete task error:", error.message);
     res.status(500).json({ error: error.message });
   }
 };

@@ -2,12 +2,21 @@ import { useState } from "react";
 
 const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
   const [title, setTitle] = useState("");
+  const [priority, setPriority] = useState("low");
 
   const handleSubmit = () => {
     if (title.trim()) {
-      onSubmit(title.trim());
+      onSubmit(title.trim(), priority);
       setTitle("");
+      setPriority("low");
       onClose();
+    }
+  };
+
+  // Add the missing handleKeyPress function
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
     }
   };
 
@@ -29,10 +38,26 @@ const CreateTicketModal = ({ isOpen, onClose, onSubmit }) => {
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              onKeyPress={handleKeyPress}
               placeholder="Enter task title..."
               className="form-input"
               autoFocus
             />
+          </div>
+          <div className="form-group">
+            <label htmlFor="priority" className="form-label">
+              Priority
+            </label>
+            <select
+              id="priority"
+              value={priority}
+              onChange={(e) => setPriority(e.target.value)}
+              className="form-input"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
           </div>
           <div className="modal-actions">
             <button type="button" onClick={onClose} className="btn-secondary">

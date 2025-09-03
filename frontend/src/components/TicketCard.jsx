@@ -1,16 +1,21 @@
 import { useState } from "react";
 import {
-  ChevronDown,
   ChevronRight,
   MessageSquare,
   User,
   BarChart3,
+  Trash2,
+  Eye,
 } from "lucide-react";
-import SubtaskCard from "./SubTask";
 
-const TicketCard = ({ task, onAddComment, onUpdateStatus }) => {
+const TicketCard = ({
+  task,
+  onAddComment,
+  onUpdateStatus,
+  onDeleteTask,
+  onShowDetails,
+}) => {
   const [showComments, setShowComments] = useState(false);
-  const [showSubtasks, setShowSubtasks] = useState(true);
   const [newComment, setNewComment] = useState("");
   const [author, setAuthor] = useState("");
 
@@ -33,10 +38,36 @@ const TicketCard = ({ task, onAddComment, onUpdateStatus }) => {
     }
   };
 
-  const handleSubtaskUpdate = (subtaskId, newStatus) => {
-    // This would typically update the subtask status via API
-    console.log(`Update subtask ${subtaskId} to ${newStatus}`);
-    // For now, we'll just log it. In a real app, you'd update the state/API
+  const handleDeleteTask = (e) => {
+    e.stopPropagation(); // Prevent any parent click events
+    console.log("Delete button clicked for task:", task._id); // Debug log
+    if (window.confirm(`Are you sure you want to delete "${task.title}"?`)) {
+      console.log("User confirmed deletion"); // Debug log
+      onDeleteTask(task._id);
+    } else {
+      console.log("User cancelled deletion"); // Debug log
+    }
+  };
+
+  const renderTruncatedDescription = () => {
+    if (!task.aiProcessed) {
+      return (
+        <div className="ai-loading">
+          <div className="ai-spinner"></div>
+          AI is generating description...
+        </div>
+      );
+    }
+
+    const description = task.description || "No description available";
+    const truncatedDescription =
+      description.length > 30
+        ? `${description.substring(0, 30)}...`
+        : description;
+
+    return (
+      <div className="ticket-description-preview">{truncatedDescription}</div>
+    );
   };
 
   return (
@@ -57,52 +88,23 @@ const TicketCard = ({ task, onAddComment, onUpdateStatus }) => {
             )}
           </div>
         </div>
-        <div className="story-points">
-          <BarChart3 size={12} />
-          {task.storyPoints || 0}
-        </div>
-      </div>
-
-      {/* Description */}
-      <div className="ticket-description">
-        {task.aiProcessed ? (
-          task.description || "No description available"
-        ) : (
-          <div className="ai-loading">
-            <div className="ai-spinner"></div>
-            AI is generating description...
+        <div className="ticket-header-actions">
+          <div className="story-points">
+            <BarChart3 size={12} />
+            {task.storyPoints || 0}
           </div>
-        )}
+          <button
+            onClick={handleDeleteTask}
+            className="delete-btn"
+            title="Delete task"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
       </div>
 
-      {/* Subtasks */}
-      {task.subtasks && task.subtasks.length > 0 && (
-        <div className="subtasks-section">
-          <button
-            onClick={() => setShowSubtasks(!showSubtasks)}
-            className="subtasks-toggle"
-          >
-            {showSubtasks ? (
-              <ChevronDown size={16} />
-            ) : (
-              <ChevronRight size={16} />
-            )}
-            Subtasks ({task.subtasks.length})
-          </button>
-
-          {showSubtasks && (
-            <div className="subtasks-list">
-              {task.subtasks.map((subtask) => (
-                <SubtaskCard
-                  key={subtask.id}
-                  subtask={subtask}
-                  onUpdateSubtask={handleSubtaskUpdate}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      )}
+      {/* Truncated Description */}
+      {renderTruncatedDescription()}
 
       {/* Actions */}
       <div className="ticket-actions">
@@ -122,6 +124,15 @@ const TicketCard = ({ task, onAddComment, onUpdateStatus }) => {
         >
           <MessageSquare size={16} />
           {task.comments?.length || 0}
+        </button>
+
+        <button
+          onClick={() => onShowDetails(task)}
+          className="details-btn"
+          title="View details"
+        >
+          <Eye size={16} />
+          Details
         </button>
       </div>
 

@@ -6,6 +6,7 @@ const TicketBoard = ({
   onAddComment,
   onUpdateStatus,
   onShowDetails,
+  onDeleteTask,
 }) => {
   const todoTasks = tasks.filter((task) => task.status === "todo");
   const inProgressTasks = tasks.filter((task) => task.status === "in-progress");
@@ -39,6 +40,7 @@ const TicketBoard = ({
               onAddComment={onAddComment}
               onUpdateStatus={onUpdateStatus}
               onShowDetails={onShowDetails}
+              onDeleteTask={onDeleteTask}
             />
           ))}
         </div>
@@ -60,6 +62,7 @@ const TicketBoard = ({
               onAddComment={onAddComment}
               onUpdateStatus={onUpdateStatus}
               onShowDetails={onShowDetails}
+              onDeleteTask={onDeleteTask}
             />
           ))}
         </div>
@@ -81,6 +84,7 @@ const TicketBoard = ({
               onAddComment={onAddComment}
               onUpdateStatus={onUpdateStatus}
               onShowDetails={onShowDetails}
+              onDeleteTask={onDeleteTask}
             />
           ))}
         </div>
